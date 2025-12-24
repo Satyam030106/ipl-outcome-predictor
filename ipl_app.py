@@ -5,7 +5,6 @@ import numpy as np
 
 st.set_page_config(page_title="IPL Predictor", layout="wide")
 
-@st.cache_resource
 def load_models():
     try:
         first_inning_model = pickle.load(open("firstinning_model.pkl", "rb"))
