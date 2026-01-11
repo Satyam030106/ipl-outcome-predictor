@@ -11,7 +11,7 @@ based on real-time match conditions such as runs, overs, wickets, teams, and ven
 
 ## 🚀 Live Demo
 
-🔗 **Streamlit App**: https://ipl-outcome-predictor-ebjuaappcgo3xsbyuy4uxvp.streamlit.app/
+🔗 **Streamlit App**: https://ipl-outcome-predictor-avchpgaer9nax5hdozalpz.streamlit.app/
 
 ---
 
