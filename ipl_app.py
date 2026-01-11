@@ -37,11 +37,18 @@ cities = [
     'Sharjah', 'Unknown', 'Visakhapatnam'
 ]
 
-st.title("🏏 IPL Predictor System")
 
-tab1, tab2 = st.tabs(["First Inning Score Predictor", "Match Winner Predictor (Second Inning)"])
+st.sidebar.title("🏏 IPL Predictor")
+st.sidebar.markdown("---")
+prediction_mode = st.sidebar.radio(
+    "Choose Prediction Type:",
+    ("First Inning Score Prediction", "Match Winner Prediction(Target Chasing)")
+)
+st.sidebar.markdown("---")
 
-with tab1:
+if prediction_mode == "First Inning Score Prediction":
+    banner_path = r"C:\Users\Satyam Singh\Desktop\fastapi\projectipl\ipl2.jpeg"
+    st.image(banner_path, width=800)
     st.header("First Inning Score Prediction")
     col1, col2 = st.columns(2)
     
@@ -52,10 +59,10 @@ with tab1:
         toss_winner_1 = st.selectbox("Toss Winner", sorted(teams), key="toss1")
         
     with col2:
-        toss_decision_1 = st.selectbox("Toss Decision", ['field', 'bat'], key="dec1")
+        toss_decision_1 = st.radio("Toss Decision", ['bat', 'field'], horizontal=True, key="dec1")
         current_score_1 = st.number_input("Current Score", min_value=0, step=1, key="score1")
         overs_completed_1 = st.number_input("Overs Completed (e.g., 10.2)", min_value=0.0, max_value=20.0, step=0.1, key="over1")
-        wickets_fallen_1 = st.number_input("Wickets Fallen", min_value=0, max_value=10, step=1, key="wick1")
+        wickets_fallen_1 = st.slider("Wickets Down", 0, 10, 0, 1, key="wick1")
 
     if st.button("Predict Score"):
         if batting_team_1 == bowling_team_1:
@@ -95,7 +102,9 @@ with tab1:
             except Exception as e:
                 st.error(f"Error in prediction: {e}")
 
-with tab2:
+if prediction_mode == "Match Winner Prediction(Target Chasing)":
+    banner_path = r"C:\Users\Satyam Singh\Desktop\fastapi\projectipl\ipl1.jpeg"
+    st.image(banner_path, width=800)
     st.header("Match Winner Prediction (Target Chasing)")
     
     col3, col4 = st.columns(2)
@@ -109,7 +118,7 @@ with tab2:
         target_score = st.number_input("Target Score", min_value=1, step=1, key="target2")
         current_score_2 = st.number_input("Current Score", min_value=0, step=1, key="score2")
         overs_completed_2 = st.number_input("Overs Completed", min_value=0.0, max_value=20.0, step=0.1, key="over2")
-        wickets_fallen_2 = st.number_input("Wickets Fallen", min_value=0, max_value=10, step=1, key="wick2")
+        wickets_fallen_2 = st.slider("Wickets Fallen", 0, 10, 0, 1, key="wick2")
 
     if st.button("Predict Winner"):
         if batting_team_2 == bowling_team_2:
@@ -162,3 +171,4 @@ with tab2:
 
 st.markdown("---")
 st.markdown("Developed by Satyam Singh | Powered by Machine Learning")
+
