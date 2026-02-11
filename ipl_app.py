@@ -11,7 +11,7 @@ def load_models():
         match_winner_model = pickle.load(open("ipl_model.pkl", "rb"))
         return first_inning_model, match_winner_model
     except FileNotFoundError:
-        st.error("Model files not found. Please ensure 'firstinning_model.pkl' and 'ipl_model.pkl' are in the directory.")
+        st.error("Model files not found.")
         return None, None
 
 first_inning_pipe, match_winner_pipe = load_models()
@@ -42,7 +42,7 @@ st.sidebar.title("🏏 IPL Predictor")
 st.sidebar.markdown("---")
 prediction_mode = st.sidebar.radio(
     "Choose Prediction Type:",
-    ("First Inning Score Prediction", "Match Winner Prediction(Target Chasing)")
+    ("First Inning Score Prediction", "Match Winner Prediction(Target Chasing)","Pressure Index Prediction")
 )
 st.sidebar.markdown("---")
 
@@ -168,6 +168,98 @@ if prediction_mode == "Match Winner Prediction(Target Chasing)":
                     
             except Exception as e:
                 st.error(f"Error during prediction: {e}")
+
+
+if prediction_mode == "Pressure Index Prediction":
+    banner_path = r"img3.png"
+    st.image(banner_path, width=800)
+    st.header("Pressure Index")
+    st.caption("### *Pressure index → How tense is the situation right now?*")
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        batting_team_1 = st.selectbox("Batting Team", sorted(teams), key="bat1")
+        bowling_team_1 = st.selectbox("Bowling Team", sorted(teams), key="bowl1")
+        target_score = st.number_input("Target Score", min_value=1, step=1, key="target2")
+        
+    with col2:
+        current_score_2 = st.number_input("Current Score", min_value=0, step=1, key="score1")
+        overs_completed_2 = st.number_input("Overs Completed (e.g., 10.2)", min_value=0.0, max_value=20.0, step=0.1, key="over1")
+        wickets_fallen_2 = st.slider("Wickets Down", 0, 10, 0, 1, key="wick1")
+
+    if st.button("Predict Pressure Index"):
+        if batting_team_1 == bowling_team_1:
+            st.error("Batting and Bowling teams must be different!")
+        else:
+            runs_left = target_score - current_score_2
+            
+            overs_val_2 = int(overs_completed_2)
+            balls_val_2 = int(round((overs_completed_2 - overs_val_2) * 10))
+            balls_left = 120 - ((overs_val_2 * 6) + balls_val_2)
+            
+            wickets_remaining = 10 - wickets_fallen_2
+            
+            crr = current_score_2 / overs_completed_2 if overs_completed_2 > 0 else 0
+            rrr = (runs_left * 6) / balls_left if balls_left > 0 else 0
+
+
+            
+            def calculate_pressure_index(rrr, balls_left, wickets_remaining):
+                # Normalize RRR pressure
+                rrr_pressure = min(rrr / 12, 1)
+
+                # Normalize wicket pressure
+                wicket_pressure = 1 - (wickets_remaining / 10)
+
+                # Normalize balls pressure
+                balls_pressure = 1 - (balls_left / 120)
+
+                # Weighted combination
+                pressure_index = (
+                    0.4 * rrr_pressure +
+                    0.35 * wicket_pressure +
+                    0.25 * balls_pressure
+             )
+                pressure_score = round(pressure_index * 100, 2)
+                return pressure_score
+            
+
+
+            def pressure_level(score):
+                if score < 40:
+                    return "Low Pressure 🟢"
+                elif score < 70:
+                    return "Medium Pressure 🟡"
+                else:
+                    return "High Pressure 🔴"
+                
+
+            pressure_score = calculate_pressure_index(
+            rrr=rrr,
+            balls_left=balls_left,
+            wickets_remaining=wickets_remaining
+             )
+
+            pressure_label = pressure_level(pressure_score)
+
+            st.markdown("---")
+            st.subheader("Match Pressure Analysis")
+
+            colp1, colp2 = st.columns(2)
+
+            with colp1:
+                st.metric(
+                    label="Pressure Index",
+                    value=f"{pressure_score} / 100"
+                )
+
+            with colp2:
+                st.metric(
+                    label="Pressure Level",
+                    value=pressure_label
+                )
+
+            
 
 st.markdown("---")
 st.markdown("Developed by Satyam Singh | Powered by Machine Learning")
